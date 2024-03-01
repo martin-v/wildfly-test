@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>my.project.org</groupId>
+    <artifactId>sampleproject</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>17</maven.compiler.release>
+
+        <!-- wildfly.version>30.0.0.Final</wildfly.version -->
+        <wildfly.version>31.0.0.Final</wildfly.version>
+    </properties>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <!-- Jakarta EE doesn't require web.xml, Maven needs to catch up! -->
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>4.2.1.Final</version>
+
+				<configuration>
+						<version>${wildfly.version}</version>
+						<feature-packs>
+							<feature-pack>
+								<location>
+									org.wildfly:wildfly-galleon-pack:${wildfly.version}</location>
+							</feature-pack>
+						</feature-packs>
+					<layers>
+						<layer>ee-core-profile-server</layer>
+						<layer>core-tools</layer>
+						<layer>jaxrs</layer>
+						<layer>messaging-activemq</layer>
+					</layers>
+					<packagingScripts>
+						<packagingScript>
+							<scripts>
+								<script>${project.build.scriptSourceDirectory}/messaging.cli</script>
+							</scripts>
+						</packagingScript>
+					</packagingScripts>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>image</goal>
+						</goals>
+					</execution>
+				</executions>
+
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
